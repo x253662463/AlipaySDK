@@ -7,9 +7,11 @@
 class AlipayApi
 {
 
-    public function wapPay(AlipayContent $content)
+    public function wapPay($content)
     {
         $content = $content->generateContent();
+
+
     }
 
     public function writeLog($message,$path = '/log')

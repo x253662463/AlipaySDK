@@ -1,6 +1,17 @@
 <?php
 
-class AlipayContent
+class alipayCommenContent
+{
+
+}
+
+class alipayRequestContent
+{
+
+}
+
+
+class alipayWapContent
 {
     private $content;
 
