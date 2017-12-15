@@ -2,55 +2,54 @@
 
 class alipayCommenContent
 {
-    private $config = array();
+    //公共请求参数
 
-//    /**
-//     * 获取网关url
-//     */
-//    public function getGatewayUrl()
-//    {
-//        return $this->config['gateway_url'];
-//    }
-//
-//    /**
-//     * 设置网关url
-//     */
-//    public function setGatewayUrl($url)
-//    {
-//        $this->config['gateway_url'] = $url;
-//    }
-//
-//    /**
-//     * 判断网关url是否设置
-//     */
-//    public function isSetGatewayUrl()
-//    {
-//        return array_key_exists('gateway_url', $this->config);
-//    }
-//
-//    /**
-//     * 获取编码
-//     */
-//    public function getCharset()
-//    {
-//        return $this->config['charset'];
-//    }
-//
-//    /**
-//     * 设置编码
-//     */
-//    public function setCharset($charset)
-//    {
-//        $this->config['charset'] = $charset;
-//    }
-//
-//    /**
-//     * 判断编码是否设置
-//     */
-//    public function isSetCharset()
-//    {
-//        return array_key_exists('charset', $this->config);
-//    }
+
+    protected $gatewayUrl = "";
+
+    /*
+     * 公共请求参数，
+     */
+    private $commonParams = array();
+
+    /**
+     * 设置公共请求参数
+     * @param $key
+     * @param $value
+     */
+    public function setCommonParams($key, $value)
+    {
+        $this->commonParams[$key] = $value;
+    }
+
+    /**
+     * 读取配置
+     * @param $key
+     * @return mixed
+     */
+    public function getCommonParams($key)
+    {
+        return $this->commonParams[$key];
+    }
+
+    /**
+     * 判断配置是否有配置
+     * @param $key
+     * @return mixed
+     */
+    public function isSetCommonParams($key)
+    {
+        return $this->commonParams[$key];
+    }
+
+    /**
+     * 设置网关请求地址
+     * @param string $gateway_url
+     */
+    public function setGatewayUrl($gateway_url)
+    {
+        $this->gateway_url = $gateway_url;
+    }
 }
 
 class alipayRequestContent
@@ -61,7 +60,40 @@ class alipayRequestContent
 /*
  * 支付宝登陆构造类
  */
-class loginContent extends alipayCommenContent{
+class alipayAuthContent extends alipayCommenContent{
+
+    protected $gatewayUrl = "https://openapi.alipay.com/gateway.do";
+
+    /*
+     * 公共请求参数包括：
+     * app_id,method,format,return_url,charset,sign_type,sign,
+     * timestamp,version,app_auth_token,biz_content
+     */
+    private $commonParamsArray = array(
+        'app_id' => '',
+        'method' => 'alipay.user.info.auth',
+        'format' => 'JSON',
+        'return_url' => '',
+        'charset' => '',
+        'sign_type' => '',
+        'sign' => '',
+        'timestamp' => '',
+        'version' => '1.0',
+        'app_auth_token' => '',
+        'biz_content' => ''
+    );
+
+    /*
+     * 请求参数包括scopes,state
+     */
+    private $params = array();
+
+    public function __construct()
+    {
+        foreach ($this->commonParamsArray as $key => $param){
+            $this->setCommonParams($key,$param);
+        }
+    }
 
 }
 

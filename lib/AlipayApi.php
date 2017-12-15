@@ -21,17 +21,13 @@ class AlipayApi
 
     public function buildFormHtml(alipayCommenContent $content)
     {
-        $sHtml = "<form id='alipaysubmit' name='alipaysubmit' action='".$content->getGatewayUrl()."?charset=".trim($this->postCharset)."' method='POST'>";
-        while (list ($key, $val) = each ($para_temp)) {
-            if (false === $this->checkEmpty($val)) {
-                //$val = $this->characet($val, $this->postCharset);
-                $val = str_replace("'","&apos;",$val);
-                //$val = str_replace("\"","&quot;",$val);
-                $sHtml.= "<input type='hidden' name='".$key."' value='".$val."'/>";
-            }
+        $sHtml = "<form id='alipaysubmit' name='alipaysubmit' action='" .
+            $content->getConfig('gateway_url') . "?charset=".trim($content->getConfig('charset'))."' method='POST'>";
+        foreach ($content as $key => $value){
+            //TODO:判断字符传是否为空
+            $value = str_replace("'","&apos;",$value);
+            $sHtml .= "<input type='hidden' name='" . $key . "' value='" . $value . "'/>";
         }
-
-        //submit按钮控件请不要含有name属性
         $sHtml = $sHtml."<input type='submit' value='ok' style='display:none;''></form>";
 
         $sHtml = $sHtml."<script>document.forms['alipaysubmit'].submit();</script>";
