@@ -22,6 +22,12 @@ abstract class alipayContent
     //接口必须参数
     protected $checkRequired = array();
 
+    //支付宝默认网关
+    protected $gateway = array(
+        0 => 'https://openapi.alipaydev.com/gateway.do',
+        1 => 'https://openapi.alipay.com/gateway.do'
+    );
+
     /**
      * @return mixed
      */
@@ -298,10 +304,91 @@ abstract class alipayContent
         return false;
     }
 
+    /**
+     * 生成请求url
+     * @return string
+     */
+    public function generateUrl()
+    {
+        $request_url = $this->gateway[AlipayConfig::APP_ENVIRONMENT] . '?';
+        foreach ($this->commonParams as $key => $val){
+            $request_url .= "$key=" . urlencode($val) . "&";
+        }
+        $request_url = trim($request_url,'&');
+        return $request_url;
+    }
+
 
 }
 
+/*
+ * 支付API开始
+ */
 
+// alipay.trade.fastpay.refund.query(统一收单交易退款查询)
+class alipayTradeFastpayRefundQuery extends alipayContent{
+
+}
+
+// alipay.trade.order.settle(统一收单交易结算接口)
+class alipayTradeOrderSettle extends alipayContent{
+
+}
+
+// alipay.trade.close(统一收单交易关闭接口)
+class alipayTradeClose extends alipayContent{
+
+}
+
+// alipay.trade.cancel(统一收单交易撤销接口)
+class alipayTradeCancel extends alipayContent{
+
+}
+
+// alipay.trade.refund(统一收单交易退款接口)
+
+class alipayTradeRefund extends alipayContent{
+
+}
+
+// alipay.trade.precreate(统一收单线下交易预创建)
+class alipayTradePrecreate extends alipayContent{
+
+}
+// alipay.trade.create(统一收单交易创建接口)
+class alipayTradeCreate extends alipayContent{
+
+}
+
+// alipay.trade.pay(统一收单交易支付接口)
+class alipayTradePay extends alipayContent{
+
+}
+
+// alipay.trade.query(统一收单线下交易查询)
+class alipayTradeQuery extends alipayContent{
+
+}
+/*
+ * 支付API结束
+ */
+
+
+/*
+ * 工具类Api开始
+ */
+
+//用户进行账密、扫码登陆并授权alipay.user.info.auth
+class alipayUserInfoAuth extends alipayContent{
+
+}
+
+// 查询某个应用授权AppAuthToken的授权信息alipay.open.auth.token.app.query
+class alipayOpenAuthTokenAppQuery extends alipayContent{
+
+}
+
+// 换取应用授权令牌，即app_auth_code换取app_auth_token
 class alipayAuthTokenApp extends alipayContent {
 
     /**
@@ -360,93 +447,26 @@ class alipayAuthTokenApp extends alipayContent {
     }
 }
 
-/*
- * 支付宝登陆构造类
- */
-//class alipayAuthContent extends alipayContent {
-//
-//    protected $gatewayUrl = "https://openapi.alipay.com/gateway.do";
-//
-//    /*
-//     * 公共请求参数包括：
-//     * app_id,method,format,return_url,charset,sign_type,sign,
-//     * timestamp,version,app_auth_token,biz_content
-//     */
-//    private $commonParamsArray = array(
-//        'app_id' => '',
-//        'method' => 'alipay.user.info.auth',
-//        'format' => 'JSON',
-//        'return_url' => '',
-//        'charset' => '',
-//        'sign_type' => '',
-//        'sign' => '',
-//        'timestamp' => '',
-//        'version' => '1.0',
-//        'app_auth_token' => '',
-//        'biz_content' => ''
-//    );
-//
-//    /*
-//     * 请求参数包括scopes,state
-//     */
-//    private $params = array();
-//
-//    public function __construct()
-//    {
-//        foreach ($this->commonParamsArray as $key => $param){
-//            $this->setCommonParams($key,$param);
-//        }
-//    }
-//
-//}
+// alipay.offline.market.reporterror.create(上报线下服务异常)
+class alipayOfflineMarketReporterrorCreate extends alipayContent{
+
+}
+
+// alipay.system.oauth.token(换取授权访问令牌)
+class alipaySystemOauthToken extends alipayContent{
+
+}
+
+// koubei.member.data.oauth.query(口碑业务授权令牌查询)
+class koubeiMemberDateOauthQuery extends alipayContent{
+
+}
+
+// monitor.heartbeat.syn(验签接口)
+class monitorHeartbeatSyn extends alipayContent{
+
+}
 
 /*
- * 支付宝手机支付构造类
+ * 工具类Api结束
  */
-//class wapPayContent extends alipayAuthContent
-//{
-//    private $content;
-//
-//    public function __construct()
-//    {
-//        $this->content['productCode'] = "QUICK_WAP_PAY";
-//    }
-//
-//    public function generateContent()
-//    {
-//        if (!empty($this->content)){
-//            $this->content = json_encode($this->content,JSON_UNESCAPED_UNICODE);
-//        }
-//        return $this->content;
-//    }
-//
-//    public function setBody($body)
-//    {
-//        $this->content['body'] = $body;
-//    }
-//
-//    public function setSubject($subject)
-//    {
-//        $this->content['subject'] = $subject;
-//    }
-//
-//    public function setOutTradeNo($outTradeNo)
-//    {
-//        $this->content['out_trade_no'] = $outTradeNo;
-//    }
-//
-//    public function setTimeExpress($timeExpress)
-//    {
-//        $this->content['timeout_express'] = $timeExpress;
-//    }
-//
-//    public function setTotalAmount($totalAmount)
-//    {
-//        $this->content['total_amount'] = $totalAmount;
-//    }
-//
-//    public function setSellerId($sellerId)
-//    {
-//        $this->content['seller_id'] = $sellerId;
-//    }
-//}
