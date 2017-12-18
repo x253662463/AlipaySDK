@@ -8,12 +8,6 @@ require_once 'AlipayConfig.php';
 class AlipayApi
 {
 
-    //支付宝默认网关
-    private $gateway = array(
-        0 => 'https://openapi.alipaydev.com/gateway.do',
-        1 => 'https://openapi.alipay.com/gateway.do'
-    );
-
     //支付宝登陆授权链接
     private $auth_url = array(
         0 => 'https://openauth.alipaydev.com/oauth2/appToAppAuth.htm',//沙箱环境
@@ -38,25 +32,18 @@ class AlipayApi
      * 用code换取auth_token
      * @param $code
      */
-    public function getAuthToken(alipayAuthTokenApp $alipayAuthTokenApp)
+    public function getAuthToken(alipayContent $alipayContent)
     {
-        $alipayAuthTokenApp->checkParams();
+        $alipayContent->checkParams();
 
-        $alipayAuthTokenApp->generateSign();
-        $request_url = $this->gateway[AlipayConfig::APP_ENVIRONMENT] . '?';
-        foreach ($alipayAuthTokenApp->getCommonParams() as $key => $val){
-            $request_url .= "$key=" . urlencode($val) . "&";
-        }
-        $request_url = trim($request_url,'&');
+        $alipayContent->generateSign();
 
+        $request_url = $alipayContent->generateUrl();
 
-        $resp = $this->curl($request_url,$alipayAuthTokenApp->getBizContent());
+        $resp = $this->curl($request_url,$alipayContent->getBizContent());
 
         header("Content-type: text/html; charset=utf-8");
         echo $resp;exit;
-        $encode = mb_detect_encoding($resp, array("ASCII","UTF-8","GB2312","GBK","BIG5"));
-        var_dump($encode);exit;
-        var_dump($resp);exit;
     }
 
     /**
