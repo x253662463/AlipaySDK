@@ -8,10 +8,15 @@ require_once 'AlipayConfig.php';
 class AlipayApi
 {
 
+    private $gateway = array(
+        0 => 'https://openapi.alipaydev.com/gateway.do',
+        1 => 'https://openapi.alipay.com/gateway.do'
+    );
+
     //支付宝登陆授权链接
     private $auth_url = array(
-        0 => 'https://openauth.alipaydev.com/oauth2/appToAppAuth.htm',//沙箱环境
-        1 => 'https://openauth.alipay.com/oauth2/appToAppAuth.htm'
+        0 => 'https://openauth.alipaydev.com/oauth2/publicAppAuthorize.htm',//沙箱环境
+        1 => 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm'
     );
 
     /**
@@ -23,8 +28,8 @@ class AlipayApi
     public function getRequestCodeURL($open_id, $redirect_url)
     {
         $url = $this->auth_url[AlipayConfig::APP_ENVIRONMENT];
-        $url .= "?app_id=" . $open_id;
-        $url .= "&redirect_uri=" . $redirect_url;
+        $url .= "?app_id=" . $open_id . '&scope=auth_user';
+        $url .= "&redirect_uri=" . urlencode($redirect_url);
         return $url;
     }
 
@@ -32,7 +37,7 @@ class AlipayApi
      * 用code换取auth_token
      * @param $code
      */
-    public function getAuthToken(alipayContent $alipayContent)
+    public function request(alipayContent $alipayContent)
     {
         $alipayContent->checkParams();
 
@@ -40,10 +45,24 @@ class AlipayApi
 
         $request_url = $alipayContent->generateUrl();
 
+
         $resp = $this->curl($request_url,$alipayContent->getBizContent());
 
-        header("Content-type: text/html; charset=utf-8");
-        echo $resp;exit;
+        $resp = json_decode($resp,true);
+
+        return $resp;
+    }
+
+    public function pay(AlipayContent $alipayContent){
+        $alipayContent->checkParams();
+
+
+        $alipayContent->generateSign();
+
+//        var_dump($alipayContent->getCommonParams());exit;
+
+        return $this->buildFormHtml($alipayContent->getCommonParams());
+
     }
 
     /**
@@ -137,7 +156,7 @@ class AlipayApi
     public function buildFormHtml($content)
     {
         $sHtml = "<form id='alipaysubmit' name='alipaysubmit' action='" .
-            $content->getConfig('gateway_url') . "?charset=".trim($content->getConfig('charset'))."' method='POST'>";
+            $this->gateway[AlipayConfig::APP_ENVIRONMENT] . "?charset=".trim($content['charset'])."' method='POST'>";
         foreach ($content as $key => $value){
             //TODO:判断字符传是否为空
             $value = str_replace("'","&apos;",$value);

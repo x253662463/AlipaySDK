@@ -198,7 +198,9 @@ abstract class alipayContent
 
     public function generateBizContent()
     {
-        $this->commonParams['biz_content'] = json_encode($this->bizContent,256);
+        if (!empty($this->bizContent)){
+            $this->commonParams['biz_content'] = json_encode($this->bizContent,256);
+        }
     }
 
     public function __construct()
@@ -216,8 +218,9 @@ abstract class alipayContent
      */
     public function checkParams()
     {
+        $array = array_merge($this->commonParams,$this->bizContent);
         foreach ($this->checkRequired as $key => $value){
-            if (!array_key_exists($value,$this->commonParams)){
+            if (!array_key_exists($value,$array)){
                 //TODO:优化错误提醒
                 echo "error," . $value . " can not be null;";exit;
 //                throw new Exception($value . "为必填参数");
@@ -355,6 +358,74 @@ class alipayTradeRefund extends alipayContent{
 class alipayTradePrecreate extends alipayContent{
 
 }
+
+//alipay.trade.wap.pay（手机网站支付）
+class alipayTradeWapPay extends alipayContent{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->bizContent['product_code'] = 'QUICK_WAP_WAY';
+        $this->setMethod('alipay.trade.wap.pay');
+        $this->commonParams['return_url'] = AlipayConfig::RETURN_URL;
+        $this->commonParams['notify_url'] = AlipayConfig::NOTIFY_URL;
+        $this->checkRequired = array('app_id', 'method', 'format', 'charset', 'sign_type', 'timestamp', 'version',
+            'subject', 'out_trade_no', 'total_amount'
+        );
+
+
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSubject()
+    {
+        return $this->bizContent['subject'];
+    }
+
+    /**
+     * @param mixed $subject
+     */
+    public function setSubject($subject)
+    {
+        $this->bizContent['subject'] = $subject;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOutTradeNo()
+    {
+        return $this->bizContent['out_trade_no'];
+    }
+
+    /**
+     * @param mixed $out_trade_no
+     */
+    public function setOutTradeNo($out_trade_no)
+    {
+        $this->bizContent['out_trade_no'] = $out_trade_no;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTotalAmount()
+    {
+        return $this->bizContent['total_amount'];
+    }
+
+    /**
+     * @param mixed $total_amount
+     */
+    public function setTotalAmount($total_amount)
+    {
+        $this->bizContent['total_amount'] = $total_amount;
+    }
+
+}
+
 // alipay.trade.create(统一收单交易创建接口)
 class alipayTradeCreate extends alipayContent{
 
@@ -454,7 +525,60 @@ class alipayOfflineMarketReporterrorCreate extends alipayContent{
 
 // alipay.system.oauth.token(换取授权访问令牌)
 class alipaySystemOauthToken extends alipayContent{
+    /**
+     * @return mixed
+     */
+    public function getGrantType()
+    {
+        return $this->commonParams['grant_type'];
+    }
 
+    /**
+     * @param mixed $grant_type
+     */
+    public function setGrantType($grant_type)
+    {
+        $this->commonParams['grant_type'] = $grant_type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCode()
+    {
+        return $this->commonParams['code'];
+    }
+
+    /**
+     * @param mixed $code
+     */
+    public function setCode($code)
+    {
+        $this->commonParams['code'] = $code;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRefreshToken()
+    {
+        return $this->commonParams['refresh_token'];
+    }
+
+    /**
+     * @param mixed $refresh_token
+     */
+    public function setRefreshToken($refresh_token)
+    {
+        $this->commonParams['refresh_token'] = $refresh_token;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setMethod('alipay.system.oauth.token');
+        $this->checkRequired = array('app_id','method','format','charset','sign_type', 'timestamp','version');
+    }
 }
 
 // koubei.member.data.oauth.query(口碑业务授权令牌查询)
@@ -470,3 +594,30 @@ class monitorHeartbeatSyn extends alipayContent{
 /*
  * 工具类Api结束
  */
+
+//alipay.user.info.share(支付宝会员授权信息查询接口)
+class alipayUserInfoShare extends alipayContent{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setMethod('alipay.user.info.share');
+        $this->checkRequired = array('app_id','method','format','charset','sign_type', 'timestamp','version','auth_token');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAuthToken()
+    {
+        return $this->commonParams['auth_token'];
+    }
+
+    /**
+     * @param mixed $auth_token
+     */
+    public function setAuthToken($auth_token)
+    {
+        $this->commonParams['auth_token'] = $auth_token;
+    }
+}
